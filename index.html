@@ -109,7 +109,11 @@
         const cdThumb=$(".cd-thumb")
         const audio = $("#audio")
         const playBtn = $(".btn-toggle-play")
+        const progress = $("#progress")
+        console.log(progress);
+
         const app = {
+            isPlaying : true,
             currentIndex:0,
             render : function() {
                const htmls =  songs.map(song=>{
@@ -141,6 +145,7 @@
             },
 
             handleEvents: function(){
+                const _this = this
                 const cd =$(".cd")
                 const cWidth = cd.offsetWidth
 
@@ -150,12 +155,34 @@
                     cd.style.width  =newWidth>0 ?newWidth +"px" : 0;
                     cd.style.opacity = newWidth/cWidth              
                 })
-
+                
                 playBtn.onclick = function(){
-                    audio.play()
+                    
+                    if(_this.isPlaying) {
+                        audio.play()
+                    }else{
+                        audio.pause()
+                    }
+
+                audio.onplay = function(){
                     player.classList.add('playing')
+                    _this.isPlaying = false
+                }
+                audio.onpause = function(){
+                    player.classList.remove('playing')
+                    _this.isPlaying = true
+                }
+            }
+                audio.ontimeupdate = function(){
+                    
+                    progress.value = (audio.currentTime/audio.duration)*100
 
                 }
+                progress.onchange = function(e){
+                    audio.currentTime = progress.value*audio.duration/100
+                }
+
+                
 
             },
             
